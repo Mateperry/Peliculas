@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  background-color: #A2D2FF;
+  margin: 0; /* para evitar márgenes por defecto */
+  color: white; /* si quieres texto visible sobre ese fondo */
+  
+}
+
+
+
