@@ -11,7 +11,7 @@ import Animadas from "./Sections/Animadas"
 import Terror from "./Sections/Terror"
 import Romance from "./Sections/Romance"
 import Documentales from "./Sections/Documentales"
-import Creando from "./sections/Creando";
+import Creando from "./Sections/Creando";
 
 // --- IMPORTACIONES PARA LOS MODALES ---
 import PrivacyPolicyModal from './components/PrivacyPolicyModal'
