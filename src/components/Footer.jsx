@@ -50,7 +50,7 @@ const Footer = ({ onOpenPrivacy, onOpenTerms, onOpenContact }) => { // <--- Reci
         </button>
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors duration-300"
-          onClick={() => window.open("https://portfoliomateocastro.framer.website/", "_blank")}
+          onClick={() => window.open("https://portafolio-lake-nine-75.vercel.app", "_blank")}
         >
           Portafolio Mateo Castro
         </button>
