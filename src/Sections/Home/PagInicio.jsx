@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import SeccionPeliculas from "./SeccionPeliculasInicio";
-
+import SliderInicio from "./SliderInicio";
 const Inicio = () => {
   const API_KEY = "d27772438d1557a847ef40b90d71ae43";
   const BASE_URL = "https://api.themoviedb.org/3";
 
   return (
-    <div className="px-4 py-6 space-y-10 text-[#023E8A] mt-24">
+    <div className="">
+      <SliderInicio />
       <SeccionPeliculas
         titulo="Recomendadas en el momento"
         url={`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-MX&sort_by=popularity.desc`}
@@ -27,6 +28,7 @@ const Inicio = () => {
         titulo="Películas de DC Comics"
         url={`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=9993&language=es-MX`}
       />
+
     </div>
   );
 };

@@ -6,19 +6,19 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 const DetallePelicula = () => {
   const { id } = useParams();
-  const API_KEY = "d27772438d1557a847ef40b90d71ae43";
+ const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
   const [pelicula, setPelicula] = useState(null);
   const [actores, setActores] = useState([]);
   const [director, setDirector] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const [recomendadas, setRecomendadas] = useState([]);
+  const [plataformas, setPlataformas] = useState(null); // <- Nuevo estado
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [delayDone, setDelayDone] = useState(false); // <- Nuevo estado
+  const [delayDone, setDelayDone] = useState(false);
 
   useEffect(() => {
-    
     const delayTimer = setTimeout(() => {
       setDelayDone(true);
     }, 100);
@@ -30,27 +30,30 @@ const DetallePelicula = () => {
     const fetchDatos = async () => {
       try {
         setLoading(true);
-        const [movieRes, creditsRes, videosRes, recRes] = await Promise.all([
-          fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-MX`),
-          fetch(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${API_KEY}&language=es-MX`),
-          fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}&language=es-MX`),
-          fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${API_KEY}&language=es-MX`),
-          fetch(`https://api.themoviedb.org/3/movie/${id}/similar?api_key=${API_KEY}&language=es-MX`)
+        const [movieRes, creditsRes, videosRes, recRes, provRes] = await Promise.all([
+          fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_API_KEY}&language=es-MX`),
+          fetch(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${TMDB_API_KEY}&language=es-MX`),
+          fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${TMDB_API_KEY}&language=es-MX`),
+          fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${TMDB_API_KEY}&language=es-MX`),
+          fetch(`https://api.themoviedb.org/3/movie/${id}/watch/providers?api_key=${TMDB_API_KEY}`)
         ]);
 
         const movie = await movieRes.json();
         const credits = await creditsRes.json();
         const videos = await videosRes.json();
         const recs = await recRes.json();
-        
+        const providers = await provRes.json();
 
         setPelicula(movie);
         setActores(credits.cast.slice(0, 6));
         setDirector(credits.crew.find(c => c.job === "Director"));
         const trailer = videos.results.find(v => v.type === "Trailer" && v.site === "YouTube");
         setTrailerKey(trailer?.key);
-        setRecomendadas(recs.results.slice(0, 18));
-        
+        setRecomendadas(recs.results.slice(0, 10));
+
+        // Guardamos plataformas disponibles (ejemplo: en México)
+        setPlataformas(providers.results?.MX || providers.results?.ES || null);
+
       } catch (err) {
         console.error(err);
         setError("Ocurrió un error cargando la información.");
@@ -73,7 +76,6 @@ const DetallePelicula = () => {
     return stars;
   };
 
-  // Mostrar Skeleton mientras carga o aún no han pasado los 4 segundos
   if (loading || !delayDone) {
     return (
       <div className="max-w-5xl mx-auto mt-28 space-y-6 p-4 ">
@@ -92,7 +94,7 @@ const DetallePelicula = () => {
   if (!pelicula) return null;
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8 text-gray-700 mt-24">
+    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8 text-gray-700 mt-2">
       <div className="flex flex-col md:flex-row gap-6 bg-white shadow-lg rounded-lg overflow-hidden">
         <img
           src={`https://image.tmdb.org/t/p/w500${pelicula.poster_path}`}
@@ -114,7 +116,7 @@ const DetallePelicula = () => {
             <p><strong>Presupuesto:</strong> {pelicula.budget ? `$${pelicula.budget.toLocaleString()}` : '—'}</p>
           </div>
 
-          {pelicula.genres?.length && (
+          {pelicula.genres?.length > 0 && (
             <p className="mb-4"><strong>Géneros:</strong> {pelicula.genres.map(g => g.name).join(", ")}</p>
           )}
 
@@ -134,6 +136,26 @@ const DetallePelicula = () => {
               </div>
             </div>
           )}
+
+          {/* Aquí mostramos plataformas */}
+          {plataformas && (
+            <div className="mt-4">
+              <p><strong>Disponible en:</strong></p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {plataformas.flatrate?.map(p => (
+                  <div key={p.provider_id} className="flex items-center gap-2">
+                    <img
+                      src={`https://image.tmdb.org/t/p/w45${p.logo_path}`}
+                      alt={p.provider_name}
+                      className="w-8 h-8 rounded"
+                    />
+                    <span className="text-sm">{p.provider_name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -148,25 +170,22 @@ const DetallePelicula = () => {
         </div>
       )}
 
-      
-        {recomendadas.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Películas recomendadas</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-              {recomendadas.map(p => (
-                <Link key={p.id} to={`/pelicula/${p.id}`} className="group">
-                  <img
-                    src={`https://image.tmdb.org/t/p/w300${p.poster_path}`}
-                    alt={p.title}
-                    className="rounded-lg shadow-sm group-hover:shadow-lg transition h-72 w-48 object-cover mx-auto"
-                  />
-                </Link>
-              ))}
-            </div>
+      {recomendadas.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Películas recomendadas</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {recomendadas.map(p => (
+              <Link key={p.id} to={`/pelicula/${p.id}`} className="group">
+                <img
+                  src={`https://image.tmdb.org/t/p/w300${p.poster_path}`}
+                  alt={p.title}
+                  className="rounded-lg shadow-sm group-hover:shadow-lg transition h-72 w-48 object-cover mx-auto"
+                />
+              </Link>
+            ))}
           </div>
-        )}
-
-      
+        </div>
+      )}
     </div>
   );
 };

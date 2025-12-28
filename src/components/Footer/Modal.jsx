@@ -28,11 +28,11 @@ const Modal = ({ isOpen, onClose, title, children }) => {
         onClick={(e) => e.stopPropagation()} // <-- ¡IMPORTANTE! Evita que el clic dentro del modal cierre el modal
       >
         {/* Cabecera del modal con título y botón de cierre */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-200">
+        <div className="flex justify-between items-center p-4 border-b border-gray-600">
           <h2 className="text-2xl font-semibold text-blue-600">{title}</h2>
           <button
             onClick={onClose}
-            className="text-white hover:text-gray-400 text-3xl font-bold leading-none transition-colors duration-200" // Ajustado color hover
+            className="text-white hover:text-gray-600 text-3xl font-bold leading-none transition-colors duration-200" // Ajustado color hover
             aria-label="Cerrar"
           >
             &times; {/* Símbolo "x" para cerrar */}

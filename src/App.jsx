@@ -1,46 +1,66 @@
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Inicio from "./Sections/PagInicio";
+import { Routes, Route, useLocation } from 'react-router-dom';
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
+import ScrollToTop from "./components/ScrollToTop";
+import Inicio from "./Sections/Home/Homenologueado";
 import DetallePelicula from "./components/DetallePelicula";
-import ResultadosBusqueda from "./components/Buscador"; 
-import Nuevas from "./Sections/Nuevas"
-import Clasicas from "./Sections/Clasicas"
-import Animadas from "./Sections/Animadas"
-import Terror from "./Sections/Terror"
-import Romance from "./Sections/Romance"
-import Documentales from "./Sections/Documentales"
+import DetalleSerie from "./components/DetalleSerie";
+import DetalleActor from "./components/DetalleActor";
+import ResultadosBusqueda from "./components/Header/Buscador";
+import Nuevas from "./Sections/Predetermined/Nuevas";
+import Clasicas from "./Sections/Predetermined/Clasicas";
+import Animadas from "./Sections/Predetermined/Animadas";
+import Terror from "./Sections/Predetermined/Terror";
+import Romance from "./Sections/Predetermined/Romance";
+import Documentales from "./Sections/Predetermined/Documentales";
 import Creando from "./Sections/Creando";
 
+import AuthForm from "./Sections/Login/AuthForm";
+import PerfilUsuario from "./Sections/Users/Perfil";
 // --- IMPORTACIONES PARA LOS MODALES ---
-import PrivacyPolicyModal from './components/PrivacyPolicyModal'
-import TermsAndConditionsModal from './components/Terms';
-import ContactUsModal from './components/Contact';
+import PrivacyPolicyModal from './components/Footer/PrivacyPolicyModal';
+import TermsAndConditionsModal from './components/Footer/Terms';
+import ContactUsModal from './components/Footer/Contact';
+
 function App() {
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  return (
-    <>
-      <Header />
-      
-      <Routes>
-        <Route path="/" element={<Inicio />} />
-        <Route path="/pelicula/:id" element={<DetallePelicula />} />
-        <Route path="/buscar/:query" element={<ResultadosBusqueda />} />
-        <Route path="/nuevas" element={<Nuevas />} />
-        <Route path="/Clasicas" element={<Clasicas />} />
-        <Route path="/Animadas" element={<Animadas />} />
-        <Route path="/terror" element={<Terror />} />
-        <Route path="/romance" element={<Romance />} />
-        <Route path="/documentales" element={<Documentales />} />
-        <Route path="/creando" element={<Creando />} />
-        <Route path="*" element={<Creando />} />
-      </Routes>
+  const location = useLocation();
+  const hideHeader = location.pathname === "/auth";
 
-      {/* ✅ MUEVE EL FOOTER AQUÍ */}
+  return (
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      
+      {!hideHeader && <Header />}
+      
+      <div style={{ flex: 1 }}>
+        <ScrollToTop />
+        <Routes>
+         
+
+          <Route path="/" element={<Inicio />} />
+          <Route path="/pelicula/:id" element={<DetallePelicula />} />
+          <Route path="/serie/:id" element={<DetalleSerie />} />
+          <Route path="/actor/:id" element={<DetalleActor />} />
+          <Route path="/buscar/:query" element={<ResultadosBusqueda />} />
+          <Route path="/nuevas" element={<Nuevas />} />
+          <Route path="/Clasicas" element={<Clasicas />} />
+          <Route path="/Animadas" element={<Animadas />} />
+          <Route path="/terror" element={<Terror />} />
+          <Route path="/romance" element={<Romance />} />
+          <Route path="/documentales" element={<Documentales />} />
+          <Route path="/creando" element={<Creando />} />
+          
+          {/* RUTA DE LOGIN / REGISTER */}
+          <Route path="/auth" element={<AuthForm />} />
+          <Route path="/perfil" element={<PerfilUsuario />} />
+          <Route path="*" element={<Creando />} />
+        </Routes>
+      </div>
+
       <Footer
         onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
         onOpenTerms={() => setIsTermsModalOpen(true)}
@@ -60,7 +80,7 @@ function App() {
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />
-    </>
+    </div>
   );
 }
 
